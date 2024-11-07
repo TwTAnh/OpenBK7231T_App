@@ -1,1 +1,0 @@
-openBeken_win32.exe -runUnitTests 0 -w 1600 -h 900
