@@ -29,6 +29,9 @@ jobs:
         run: make update-submodules
       - name: Semantic Release
         id: semantic
+        run: |
+          # Your semantic release logic here
+          echo "new_release_published=true" >> $GITHUB_ENV
         uses: cycjimmy/semantic-release-action@v4
         with:
           dry_run: true
