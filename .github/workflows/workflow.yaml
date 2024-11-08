@@ -1,19 +1,19 @@
 name: Build App
-# on:
-#   push:
-#     branches:
-#       - '**'
-#   pull_request:
-#     branches: 
-#       - '**'
 on:
-  repository_dispatch:
-  workflow_dispatch:
-    inputs:
-      set_release:
-        description: "nhập version cần build"
-        required: true
-        default: ""
+  push:
+    branches:
+      - '**'
+  pull_request:
+    branches: 
+      - '**'
+# on:
+#   repository_dispatch:
+#   workflow_dispatch:
+#     inputs:
+#       set_release:
+#         description: "nhập version cần build"
+#         required: true
+#         default: ""
 
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
