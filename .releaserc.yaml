@@ -32,6 +32,8 @@ analyzeCommits:
       release: "patch"
     - message: "*"
       release: "patch"
+    - type: "docs"
+      release: "none"
 generateNotes:
   - path: "@semantic-release/release-notes-generator"
     writerOpts:
