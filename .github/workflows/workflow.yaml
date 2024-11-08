@@ -35,8 +35,6 @@ jobs:
           submodules: recursive        
       - name: Update SDKs if required
         run: make update-submodules
-      - name: Set MANUAL_RELEASE_VERSION
-        run: echo "MANUAL_RELEASE_VERSION=${{ github.event.inputs.set_release }}" >> $GITHUB_ENV
       - name: Semantic Release
         id: semantic
         uses: cycjimmy/semantic-release-action@v4
@@ -49,7 +47,6 @@ jobs:
             conventional-changelog-conventionalcommits@7
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          MANUAL_RELEASE_VERSION: ${{ steps.semantic.outputs.new_release_version }}
       - name: Set outputs
         id: refs
         run: |
@@ -121,7 +118,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        platform: [OpenBK7231T, OpenBK7231N, OpenXR809, OpenBL602, OpenW800, OpenW600, OpenLN882H]
+        platform: [OpenBK7231T, OpenBK7231N]
     steps:
       - name: Source checkout
         uses: actions/checkout@v3
@@ -153,16 +150,8 @@ jobs:
             output/${{ needs.refs.outputs.version }}/OpenBK7231T_QIO_${{ needs.refs.outputs.version }}.bin
             output/${{ needs.refs.outputs.version }}/OpenBK7231N_QIO_${{ needs.refs.outputs.version }}.bin
             output/${{ needs.refs.outputs.version }}/OpenBK7231N_UG_${{ needs.refs.outputs.version }}.bin
-            output/${{ needs.refs.outputs.version }}/OpenBK7231M_QIO_${{ needs.refs.outputs.version }}.bin
             output/${{ needs.refs.outputs.version }}/${{ matrix.platform }}_${{ needs.refs.outputs.version }}.rbl
-            output/${{ needs.refs.outputs.version }}/${{ matrix.platform }}_${{ needs.refs.outputs.version }}.img
             output/${{ needs.refs.outputs.version }}/${{ matrix.platform }}_${{ needs.refs.outputs.version }}.bin
-            output/${{ needs.refs.outputs.version }}/${{ matrix.platform }}_${{ needs.refs.outputs.version }}.fls
-            output/${{ needs.refs.outputs.version }}/${{ matrix.platform }}_${{ needs.refs.outputs.version }}_ota.img
-            output/${{ needs.refs.outputs.version }}/${{ matrix.platform }}_${{ needs.refs.outputs.version }}_gz.img
-            output/${{ needs.refs.outputs.version }}/${{ matrix.platform }}_${{ needs.refs.outputs.version }}_OTA.bin      
-            output/${{ needs.refs.outputs.version }}/${{ matrix.platform }}_${{ needs.refs.outputs.version }}_OTA.bin.xz            
-            output/${{ needs.refs.outputs.version }}/${{ matrix.platform }}_${{ needs.refs.outputs.version }}_OTA.bin.xz.ota
           if-no-files-found: warn
 
   # build_idf:
