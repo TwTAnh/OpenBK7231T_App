@@ -29,9 +29,9 @@ analyzeCommits:
     - type: "breaking"
       release: "major"
     - type: "chore"
-      release: "patch"
+      release: false
     - message: "*"
-      release: "patch"
+      release: false
     - type: "docs"
       release: false
 generateNotes:
