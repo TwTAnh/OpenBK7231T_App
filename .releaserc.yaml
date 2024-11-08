@@ -3,7 +3,7 @@ branches:
   - name: 'alpha'
     prerelease: 'alpha'
 preset: "angular"
-tagFormat: "${env.MANUAL_RELEASE_VERSION}"
+tagFormat: "${process.env.MANUAL_RELEASE_VERSION}"
 plugins:
   - "@semantic-release/commit-analyzer"
   - "@semantic-release/release-notes-generator"
