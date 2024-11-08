@@ -49,7 +49,7 @@ jobs:
             conventional-changelog-conventionalcommits@7
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          MANUAL_RELEASE_VERSION: ${{ github.event.inputs.set_release }}
+          MANUAL_RELEASE_VERSION: ${{ steps.semantic.outputs.new_release_version }}
       - name: Set outputs
         id: refs
         run: |
