@@ -35,6 +35,8 @@ jobs:
           submodules: recursive        
       - name: Update SDKs if required
         run: make update-submodules
+      - name: Set MANUAL_RELEASE_VERSION
+        run: echo "MANUAL_RELEASE_VERSION=${{ github.event.inputs.set_release }}" >> $GITHUB_ENV
       - name: Semantic Release
         id: semantic
         uses: cycjimmy/semantic-release-action@v4
