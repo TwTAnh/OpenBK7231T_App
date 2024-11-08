@@ -30,8 +30,8 @@ analyzeCommits:
       release: "major"
     - type: "chore"
       release: false
-    # - message: "*"
-    #   release: false
+    - message: "*"
+      release: patch
     - type: "docs"
       release: false
 generateNotes:
