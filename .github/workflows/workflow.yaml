@@ -1,11 +1,19 @@
 name: Build App
+# on:
+#   push:
+#     branches:
+#       - '**'
+#   pull_request:
+#     branches: 
+#       - '**'
 on:
-  push:
-    branches:
-      - '**'
-  pull_request:
-    branches: 
-      - '**'
+  repository_dispatch:
+  workflow_dispatch:
+    inputs:
+      set_release:
+        description: "nhập version cần build"
+        required: true
+        default: ""
 
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -48,7 +56,7 @@ jobs:
           echo "short_ref: ${BRANCHTRANSLATED}"
           export VERSION=""
           if ${{ steps.semantic.outputs.new_release_published == 'true' }}; then
-            export VERSION=${{ steps.semantic.outputs.new_release_version }}
+            export VERSION=${{ github.event.inputs.set_release }}
           else
             export VERSION=${BRANCHTRANSLATED}_$(git rev-parse --short=12 HEAD)
           fi
