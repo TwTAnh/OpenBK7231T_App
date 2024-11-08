@@ -35,7 +35,7 @@ else
 endif
 
 update-submodules: submodules
-	git add sdk/OpenBK7231T sdk/OpenBK7231N sdk/OpenXR809 sdk/OpenBL602 sdk/OpenW800 sdk/OpenW600 sdk/OpenLN882H sdk/esp-idf
+	git add sdk/OpenBK7231T sdk/OpenBK7231N 
 ifdef GITHUB_ACTIONS
 	git config user.name github-actions
 	git config user.email github-actions@github.com
@@ -51,30 +51,7 @@ sdk/OpenBK7231N/apps/$(APP_NAME):
 	@echo Create symlink for $(APP_NAME) into sdk folder
 	ln -s "$(shell pwd)/" "sdk/OpenBK7231N/apps/$(APP_NAME)"
 
-sdk/OpenXR809/project/oxr_sharedApp/shared:
-	@echo Create symlink for $(APP_NAME) into sdk folder
-	ln -s "$(shell pwd)/" "sdk/OpenXR809/project/oxr_sharedApp/shared"
-
-sdk/OpenBL602/customer_app/bl602_sharedApp/bl602_sharedApp/shared:
-	@echo Create symlink for $(APP_NAME) into sdk folder
-	ln -s "$(shell pwd)/" "sdk/OpenBL602/customer_app/bl602_sharedApp/bl602_sharedApp/shared"
-
-sdk/OpenW800/sharedAppContainer/sharedApp:
-	@echo Create symlink for $(APP_NAME) into sdk folder
-	@mkdir "sdk/OpenW800/sharedAppContainer"
-	ln -s "$(shell pwd)/" "sdk/OpenW800/sharedAppContainer/sharedApp"
-
-sdk/OpenW600/sharedAppContainer/sharedApp:
-	@echo Create symlink for $(APP_NAME) into sdk folder
-	@mkdir -p "sdk/OpenW600/sharedAppContainer"
-	ln -s "$(shell pwd)/" "sdk/OpenW600/sharedAppContainer/sharedApp"
-
-sdk/OpenLN882H/project/OpenBeken/app:
-	@echo Create symlink for $(APP_NAME) into sdk folder
-	@mkdir -p "sdk/OpenLN882H/project/OpenBeken"
-	ln -s "$(shell pwd)/" "sdk/OpenLN882H/project/OpenBeken/app"
-
-.PHONY: prebuild_OpenBK7231N prebuild_OpenBK7231T prebuild_OpenBL602 prebuild_OpenLN882H prebuild_OpenW600 prebuild_OpenW800 prebuild_OpenXR809 prebuild_ESPIDF
+.PHONY: prebuild_OpenBK7231N prebuild_OpenBK7231T
 
 prebuild_OpenBK7231N:
 	@if [ -e platforms/BK7231N/pre_build.sh ]; then \
@@ -90,47 +67,6 @@ prebuild_OpenBK7231T:
 	else echo "prebuild for OpenBK7231T not found ... "; \
 	fi
 
-prebuild_OpenBL602:
-	@if [ -e platforms/BL602/pre_build.sh ]; then \
-		echo "prebuild found for OpenBL602"; \
-		sh platforms/BL602/pre_build.sh; \
-	else echo "prebuild for OpenBL602 not found ... "; \
-	fi
-
-prebuild_OpenLN882H:
-	@if [ -e platforms/LN882H/pre_build.sh ]; then \
-		echo "prebuild found for OpenLN882H"; \
-		sh platforms/LN882H/pre_build.sh; \
-	else echo "prebuild for OpenLN882H not found ... "; \
-	fi
-
-prebuild_OpenW600:
-	@if [ -e platforms/W600/pre_build.sh ]; then \
-		echo "prebuild found for OpenW600"; \
-		sh platforms/W600/pre_build.sh; \
-	else echo "prebuild for OpenW600 not found ... "; \
-	fi
-
-prebuild_OpenW800:
-	@if [ -e platforms/W800/pre_build.sh ]; then \
-		echo "prebuild found for OpenW800"; \
-		sh platforms/W800/pre_build.sh; \
-	else echo "prebuild for OpenW800 not found ... "; \
-	fi
-
-prebuild_OpenXR809:
-	@if [ -e platforms/XR809/pre_build.sh ]; then \
-		echo "prebuild found for OpenXR809"; \
-		sh platforms/XR809/pre_build.sh; \
-	else echo "prebuild for OpenXR809 not found ... "; \
-	fi
-
-prebuild_ESPIDF:
-	@if [ -e platforms/ESP-IDF/pre_build.sh ]; then \
-		echo "prebuild found for ESP-IDF"; \
-		sh platforms/ESP-IDF/pre_build.sh; \
-	else echo "prebuild for ESP-IDF not found ... "; \
-	fi
 
 # Build main binaries
 OpenBK7231T: prebuild_OpenBK7231T
@@ -139,25 +75,7 @@ OpenBK7231T: prebuild_OpenBK7231T
 OpenBK7231N: prebuild_OpenBK7231N
 	$(MAKE) APP_NAME=OpenBK7231N TARGET_PLATFORM=bk7231n SDK_PATH=sdk/OpenBK7231N APPS_BUILD_PATH=../bk7231n_os build-BK7231
 
-sdk/OpenXR809/tools/gcc-arm-none-eabi-4_9-2015q2:
-	cd sdk/OpenXR809/tools && wget -q "https://launchpad.net/gcc-arm-embedded/4.9/4.9-2015-q2-update/+download/gcc-arm-none-eabi-4_9-2015q2-20150609-linux.tar.bz2" && tar -xf *.tar.bz2 && rm -f *.tar.bz2
-
 	
-.PHONY: OpenXR809 build-XR809
-# Retry OpenXR809 a few times to account for calibration file issues
-RETRY = 3
-OpenXR809: prebuild_OpenXR809
-	@for i in `seq 1 ${RETRY}`; do ($(MAKE) -k build-XR809; echo Prebuild attempt $$i/${RETRY}); done
-	@echo Running build final time to check output
-	$(MAKE) build-XR809;
-
-build-XR809: submodules sdk/OpenXR809/project/oxr_sharedApp/shared sdk/OpenXR809/tools/gcc-arm-none-eabi-4_9-2015q2
-	$(MAKE) -C sdk/OpenXR809/src CC_DIR=$(PWD)/sdk/OpenXR809/tools/gcc-arm-none-eabi-4_9-2015q2/bin
-	$(MAKE) -C sdk/OpenXR809/src install CC_DIR=$(PWD)/sdk/OpenXR809/tools/gcc-arm-none-eabi-4_9-2015q2/bin
-	$(MAKE) -C sdk/OpenXR809/project/oxr_sharedApp/gcc CC_DIR=$(PWD)/sdk/OpenXR809/tools/gcc-arm-none-eabi-4_9-2015q2/bin
-	$(MAKE) -C sdk/OpenXR809/project/oxr_sharedApp/gcc image CC_DIR=$(PWD)/sdk/OpenXR809/tools/gcc-arm-none-eabi-4_9-2015q2/bin
-	mkdir -p output/$(APP_VERSION)
-	cp sdk/OpenXR809/project/oxr_sharedApp/image/xr809/xr_system.img output/$(APP_VERSION)/OpenXR809_$(APP_VERSION).img
 
 .PHONY: build-BK7231
 build-BK7231: submodules $(SDK_PATH)/apps/$(APP_NAME)
@@ -165,116 +83,11 @@ build-BK7231: submodules $(SDK_PATH)/apps/$(APP_NAME)
 	rm $(SDK_PATH)/platforms/$(TARGET_PLATFORM)/toolchain/$(APPS_BUILD_PATH)/tools/generate/$(APP_NAME)_*.rbl || /bin/true
 	rm $(SDK_PATH)/platforms/$(TARGET_PLATFORM)/toolchain/$(APPS_BUILD_PATH)/tools/generate/$(APP_NAME)_*.bin || /bin/true
 
-OpenBL602: submodules sdk/OpenBL602/customer_app/bl602_sharedApp/bl602_sharedApp/shared prebuild_OpenBL602
-	$(MAKE) -C sdk/OpenBL602/customer_app/bl602_sharedApp USER_SW_VER=$(APP_VERSION) CONFIG_CHIP_NAME=BL602 CONFIG_LINK_ROM=1 -j
-	$(MAKE) -C sdk/OpenBL602/customer_app/bl602_sharedApp USER_SW_VER=$(APP_VERSION) CONFIG_CHIP_NAME=BL602 bins
-	mkdir -p output/$(APP_VERSION)
-	cp sdk/OpenBL602/customer_app/bl602_sharedApp/build_out/bl602_sharedApp.bin output/$(APP_VERSION)/OpenBL602_$(APP_VERSION).bin
-	cp sdk/OpenBL602/customer_app/bl602_sharedApp/build_out/ota/dts40M_pt2M_boot2release_ef4015/FW_OTA.bin output/$(APP_VERSION)/OpenBL602_$(APP_VERSION)_OTA.bin
-	cp sdk/OpenBL602/customer_app/bl602_sharedApp/build_out/ota/dts40M_pt2M_boot2release_ef4015/FW_OTA.bin.xz output/$(APP_VERSION)/OpenBL602_$(APP_VERSION)_OTA.bin.xz
-	cp sdk/OpenBL602/customer_app/bl602_sharedApp/build_out/ota/dts40M_pt2M_boot2release_ef4015/FW_OTA.bin.xz.ota output/$(APP_VERSION)/OpenBL602_$(APP_VERSION)_OTA.bin.xz.ota
-	
-sdk/OpenW800/tools/w800/csky/bin: submodules
-	mkdir -p sdk/OpenW800/tools/w800/csky
-	# cd sdk/OpenW800/tools/w800/csky && wget -q "https://occ-oss-prod.oss-cn-hangzhou.aliyuncs.com/resource/1356021/1619529111421/csky-elfabiv2-tools-x86_64-minilibc-20210423.tar.gz" && tar -xf *.tar.gz && rm -f *.tar.gz
-	if [ ! -e sdk/OpenW800/tools/w800/csky/got_csky-elfabiv2-tools-x86_64-minilibc-20210423 ]; then cd sdk/OpenW800/tools/w800/csky && wget -q "https://occ-oss-prod.oss-cn-hangzhou.aliyuncs.com/resource/1356021/1619529111421/csky-elfabiv2-tools-x86_64-minilibc-20210423.tar.gz" && tar -xf *.tar.gz && rm -f *.tar.gz && touch got_csky-elfabiv2-tools-x86_64-minilibc-20210423 ; fi
-
-sdk/OpenW600/tools/gcc-arm-none-eabi-4_9-2014q4/bin: submodules
-	mkdir -p sdk/OpenW600/tools
-	cd sdk/OpenW600/tools && tar -xf ../support/*.tar.bz2
-
-.PHONY: OpenW800
-OpenW800: sdk/OpenW800/tools/w800/csky/bin sdk/OpenW800/sharedAppContainer/sharedApp prebuild_OpenW800
-	$(MAKE) -C sdk/OpenW800 EXTRA_CCFLAGS=-DPLATFORM_W800 CONFIG_W800_USE_LIB=n CONFIG_W800_TOOLCHAIN_PATH="$(shell realpath sdk/OpenW800/tools/w800/csky/bin)/"
-	mkdir -p output/$(APP_VERSION)
-	cp sdk/OpenW800/bin/w800/w800.fls output/$(APP_VERSION)/OpenW800_$(APP_VERSION).fls
-	cp sdk/OpenW800/bin/w800/w800_ota.img output/$(APP_VERSION)/OpenW800_$(APP_VERSION)_ota.img
-
-.PHONY: OpenW600
-OpenW600: sdk/OpenW600/tools/gcc-arm-none-eabi-4_9-2014q4/bin sdk/OpenW600/sharedAppContainer/sharedApp prebuild_OpenW600
-	$(MAKE) -C sdk/OpenW600 TOOL_CHAIN_PATH="$(shell realpath sdk/OpenW600/tools/gcc-arm-none-eabi-4_9-2014q4/bin)/" APP_VERSION=$(APP_VERSION)
-	mkdir -p output/$(APP_VERSION)
-	cp sdk/OpenW600/bin/w600/w600.fls output/$(APP_VERSION)/OpenW600_$(APP_VERSION).fls
-	cp sdk/OpenW600/bin/w600/w600_gz.img output/$(APP_VERSION)/OpenW600_$(APP_VERSION)_gz.img
-
-.PHONY: OpenLN882H
-OpenLN882H: submodules sdk/OpenLN882H/project/OpenBeken/app prebuild_OpenLN882H
-	CROSS_TOOLCHAIN_ROOT="/usr/" cmake sdk/OpenLN882H -B sdk/OpenLN882H/build
-	CROSS_TOOLCHAIN_ROOT="/usr/" cmake --build ./sdk/OpenLN882H/build
-	mkdir -p output/$(APP_VERSION)
-	cp sdk/OpenLN882H/build/bin/flashimage.bin output/$(APP_VERSION)/OpenLN882H_$(APP_VERSION).bin
-	cp sdk/OpenLN882H/build/bin/flashimage-ota-xz-v0.1.bin output/$(APP_VERSION)/OpenLN882H_$(APP_VERSION)_OTA.bin
-
-.PHONY: OpenESP32
-OpenESP32: prebuild_ESPIDF
-	-rm platforms/ESP-IDF/sdkconfig
-	IDF_TARGET="esp32" USER_SW_VER=$(APP_VERSION) cmake platforms/ESP-IDF -B platforms/ESP-IDF/build-32 
-	IDF_TARGET="esp32" USER_SW_VER=$(APP_VERSION) cmake --build ./platforms/ESP-IDF/build-32 -j $(shell nproc)
-	mkdir -p output/$(APP_VERSION)
-	esptool.py -c esp32 merge_bin -o output/$(APP_VERSION)/OpenESP32_$(APP_VERSION).factory.bin --flash_mode dio --flash_size 4MB 0x1000 ./platforms/ESP-IDF/build-32/bootloader/bootloader.bin 0x8000 ./platforms/ESP-IDF/build-32/partition_table/partition-table.bin 0x10000 ./platforms/ESP-IDF/build-32/OpenBeken.bin
-	cp ./platforms/ESP-IDF/build-32/OpenBeken.bin output/$(APP_VERSION)/OpenESP32_$(APP_VERSION).img
-
-.PHONY: OpenESP32C3
-OpenESP32C3: prebuild_ESPIDF
-	-rm platforms/ESP-IDF/sdkconfig
-	IDF_TARGET="esp32c3" USER_SW_VER=$(APP_VERSION) cmake platforms/ESP-IDF -B platforms/ESP-IDF/build-c3 
-	IDF_TARGET="esp32c3" USER_SW_VER=$(APP_VERSION) cmake --build ./platforms/ESP-IDF/build-c3 -j $(shell nproc)
-	mkdir -p output/$(APP_VERSION)
-	esptool.py -c esp32c3 merge_bin -o output/$(APP_VERSION)/OpenESP32C3_$(APP_VERSION).factory.bin --flash_mode dio --flash_size 2MB 0x0 ./platforms/ESP-IDF/build-c3/bootloader/bootloader.bin 0x8000 ./platforms/ESP-IDF/build-c3/partition_table/partition-table.bin 0x10000 ./platforms/ESP-IDF/build-c3/OpenBeken.bin
-	cp ./platforms/ESP-IDF/build-c3/OpenBeken.bin output/$(APP_VERSION)/OpenESP32C3_$(APP_VERSION).img
-
-.PHONY: OpenESP32C2
-OpenESP32C2: prebuild_ESPIDF
-	-rm platforms/ESP-IDF/sdkconfig
-	IDF_TARGET="esp32c2" USER_SW_VER=$(APP_VERSION) cmake platforms/ESP-IDF -B platforms/ESP-IDF/build-c2 
-	IDF_TARGET="esp32c2" USER_SW_VER=$(APP_VERSION) cmake --build ./platforms/ESP-IDF/build-c2 -j $(shell nproc)
-	mkdir -p output/$(APP_VERSION)
-	esptool.py -c esp32c2 merge_bin -o output/$(APP_VERSION)/OpenESP32C2_$(APP_VERSION).factory.bin --flash_mode dio --flash_size 2MB 0x0 ./platforms/ESP-IDF/build-c2/bootloader/bootloader.bin 0x8000 ./platforms/ESP-IDF/build-c2/partition_table/partition-table.bin 0x10000 ./platforms/ESP-IDF/build-c2/OpenBeken.bin
-	cp ./platforms/ESP-IDF/build-c2/OpenBeken.bin output/$(APP_VERSION)/OpenESP32C2_$(APP_VERSION).img
-
-.PHONY: OpenESP32C6
-OpenESP32C6: prebuild_ESPIDF
-	-rm platforms/ESP-IDF/sdkconfig
-	IDF_TARGET="esp32c6" USER_SW_VER=$(APP_VERSION) cmake platforms/ESP-IDF -B platforms/ESP-IDF/build-c6 
-	IDF_TARGET="esp32c6" USER_SW_VER=$(APP_VERSION) cmake --build ./platforms/ESP-IDF/build-c6 -j $(shell nproc)
-	mkdir -p output/$(APP_VERSION)
-	esptool.py -c esp32c6 merge_bin -o output/$(APP_VERSION)/OpenESP32C6_$(APP_VERSION).factory.bin --flash_mode dio --flash_size 4MB 0x0 ./platforms/ESP-IDF/build-c6/bootloader/bootloader.bin 0x8000 ./platforms/ESP-IDF/build-c6/partition_table/partition-table.bin 0x10000 ./platforms/ESP-IDF/build-c6/OpenBeken.bin
-	cp ./platforms/ESP-IDF/build-c6/OpenBeken.bin output/$(APP_VERSION)/OpenESP32C6_$(APP_VERSION).img
-
-.PHONY: OpenESP32S2
-OpenESP32S2: prebuild_ESPIDF
-	-rm platforms/ESP-IDF/sdkconfig
-	IDF_TARGET="esp32s2" USER_SW_VER=$(APP_VERSION) cmake platforms/ESP-IDF -B platforms/ESP-IDF/build-s2 
-	IDF_TARGET="esp32s2" USER_SW_VER=$(APP_VERSION) cmake --build ./platforms/ESP-IDF/build-s2 -j $(shell nproc)
-	mkdir -p output/$(APP_VERSION)
-	esptool.py -c esp32s2 merge_bin -o output/$(APP_VERSION)/OpenESP32S2_$(APP_VERSION).factory.bin --flash_mode dio --flash_size 4MB 0x1000 ./platforms/ESP-IDF/build-s2/bootloader/bootloader.bin 0x8000 ./platforms/ESP-IDF/build-s2/partition_table/partition-table.bin 0x10000 ./platforms/ESP-IDF/build-s2/OpenBeken.bin
-	cp ./platforms/ESP-IDF/build-s2/OpenBeken.bin output/$(APP_VERSION)/OpenESP32S2_$(APP_VERSION).img
-
-.PHONY: OpenESP32S3
-OpenESP32S3: prebuild_ESPIDF
-	-rm platforms/ESP-IDF/sdkconfig
-	IDF_TARGET="esp32s3" USER_SW_VER=$(APP_VERSION) cmake platforms/ESP-IDF -B platforms/ESP-IDF/build-s3 
-	IDF_TARGET="esp32s3" USER_SW_VER=$(APP_VERSION) cmake --build ./platforms/ESP-IDF/build-s3 -j $(shell nproc)
-	mkdir -p output/$(APP_VERSION)
-	esptool.py -c esp32s3 merge_bin -o output/$(APP_VERSION)/OpenESP32S3_$(APP_VERSION).factory.bin --flash_mode dio --flash_size 4MB 0x0 ./platforms/ESP-IDF/build-s3/bootloader/bootloader.bin 0x8000 ./platforms/ESP-IDF/build-s3/partition_table/partition-table.bin 0x10000 ./platforms/ESP-IDF/build-s3/OpenBeken.bin
-	cp ./platforms/ESP-IDF/build-s3/OpenBeken.bin output/$(APP_VERSION)/OpenESP32S3_$(APP_VERSION).img
-
 # clean .o files and output directory
 .PHONY: clean
 clean: 
 	$(MAKE) -C sdk/OpenBK7231T/platforms/bk7231t/bk7231t_os APP_BIN_NAME=$(APP_NAME) USER_SW_VER=$(APP_VERSION) clean
 	$(MAKE) -C sdk/OpenBK7231N/platforms/bk7231n/bk7231n_os APP_BIN_NAME=$(APP_NAME) USER_SW_VER=$(APP_VERSION) clean
-	$(MAKE) -C sdk/OpenXR809/src clean
-	$(MAKE) -C sdk/OpenXR809/project/oxr_sharedApp/gcc clean
-	$(MAKE) -C sdk/OpenW800 clean
-	$(MAKE) -C sdk/OpenW600 clean
-	test -d ./sdk/OpenLN882H/build && cmake --build ./sdk/OpenLN882H/build --target clean
-	test -d ./platforms/ESP-IDF/build-32 && cmake --build ./platforms/ESP-IDF/build-32 --target clean
-	test -d ./platforms/ESP-IDF/build-c3 && cmake --build ./platforms/ESP-IDF/build-c3 --target clean
-	test -d ./platforms/ESP-IDF/build-c2 && cmake --build ./platforms/ESP-IDF/build-c2 --target clean
-	test -d ./platforms/ESP-IDF/build-c6 && cmake --build ./platforms/ESP-IDF/build-c6 --target clean
-	test -d ./platforms/ESP-IDF/build-s2 && cmake --build ./platforms/ESP-IDF/build-s2 --target clean
-	test -d ./platforms/ESP-IDF/build-s3 && cmake --build ./platforms/ESP-IDF/build-s3 --target clean
 
 # Add custom Makefile if required
 -include custom.mk
