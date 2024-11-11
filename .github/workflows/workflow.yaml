@@ -56,7 +56,7 @@ jobs:
           echo "short_ref: ${BRANCHTRANSLATED}"
           export VERSION=""
           if ${{ steps.semantic.outputs.new_release_published == 'true' }}; then
-            export VERSION=${{ github.event.inputs.set_release }}
+            export VERSION=${{ steps.semantic.outputs.new_release_version }}
           else
             export VERSION=${BRANCHTRANSLATED}_$(git rev-parse --short=12 HEAD)
           fi
@@ -149,7 +149,6 @@ jobs:
             output/${{ needs.refs.outputs.version }}/OpenBK7231T_UG_${{ needs.refs.outputs.version }}.bin
             output/${{ needs.refs.outputs.version }}/OpenBK7231T_QIO_${{ needs.refs.outputs.version }}.bin
             output/${{ needs.refs.outputs.version }}/OpenBK7231N_QIO_${{ needs.refs.outputs.version }}.bin
-            output/${{ needs.refs.outputs.version }}/OpenBK7231N_UG_${{ needs.refs.outputs.version }}.bin
             output/${{ needs.refs.outputs.version }}/OpenBK7231N_UG_${{ needs.refs.outputs.version }}.bin
             output/${{ needs.refs.outputs.version }}/${{ matrix.platform }}_${{ needs.refs.outputs.version }}.rbl
             output/${{ needs.refs.outputs.version }}/${{ matrix.platform }}_${{ needs.refs.outputs.version }}.img
