@@ -66,7 +66,40 @@ jobs:
           echo "::set-output name=short_ref::${BRANCHTRANSLATED}"
           echo "::set-output name=sha_short::SHA-$(git rev-parse --short=12 HEAD)"
           echo "::set-output name=version::${VERSION}"
+  - name: Update build counter
+        run: |
+          # File lưu giá trị build
+          FILE=".build"
 
+          # Nếu file không tồn tại, tạo file với giá trị ban đầu
+          if [ ! -f "$FILE" ]; then
+            echo "0" > $FILE
+          fi
+
+          # Đọc giá trị hiện tại
+          BUILD=$(cat $FILE)
+
+          # Điều kiện tăng giá trị (ví dụ: kiểm tra file src/main.c thay đổi)
+		if [ "${{ steps.refs.outputs.new_release }}" == 'true' ]; then
+			BUILD=$((BUILD + 1))
+		fi
+
+          # Ghi giá trị mới vào file
+          echo "$BUILD" > $FILE
+
+          # Hiển thị giá trị mới (tùy chọn)
+          echo "New Build Counter: $BUILD"
+
+      # 3. Commit file .build (nếu có thay đổi)
+      - name: Commit updated build file
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+
+          # Kiểm tra thay đổi và commit với thông điệp [skip ci]
+          git add .build
+          git commit -m "Update build counter to $(cat .build) [skip ci]" || echo "No changes to commit"
+          git push
   build2:
     name: Build Simulator
     needs: refs
