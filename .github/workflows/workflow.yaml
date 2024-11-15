@@ -66,7 +66,7 @@ jobs:
           echo "::set-output name=short_ref::${BRANCHTRANSLATED}"
           echo "::set-output name=sha_short::SHA-$(git rev-parse --short=12 HEAD)"
           echo "::set-output name=version::${VERSION}"
-  - name: Update build counter
+ 	  - name: Update build counter
         run: |
           # File lưu giá trị build
           FILE=".build"
@@ -80,9 +80,9 @@ jobs:
           BUILD=$(cat $FILE)
 
           # Điều kiện tăng giá trị (ví dụ: kiểm tra file src/main.c thay đổi)
-		if [ "${{ steps.refs.outputs.new_release }}" == 'true' ]; then
+		  if [ "${{ steps.refs.outputs.new_release }}" == 'true' ]; then
 			BUILD=$((BUILD + 1))
-		fi
+		  fi
 
           # Ghi giá trị mới vào file
           echo "$BUILD" > $FILE
